@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grades Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: 0 auto; padding: 20px; }
+        #histogram, #pieChart { width: 300px; height: 150px; margin-top: 20px; }
+        #boxPlot { width: 300px; height: 250px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Grades Analytics</h1>
+
+    <!-- Assignment Selection Dropdown -->
+    <label for="assignmentSelect">Choose an assignment:</label>
+    <select id="assignmentSelect" onchange="fetchGrades()"></select>
+
+    <!-- Histogram Section -->
+    <h2>Histogram of Grades</h2>
+    <canvas id="histogram"></canvas>
+
+    <!-- Pie Chart Section -->
+    <h2>Pie Chart of Grade Distribution</h2>
+    <canvas id="pieChart"></canvas>
+
+    <!-- Box and Whisker Plot Section -->
+    <h2>Box and Whisker Plot</h2>
+    <div id="boxPlot"></div>
+</div>
+
+<script>
+    // Load assignments for dropdown
+    async function loadAssignments() {
+        const response = await fetch('http://localhost:8085/api/analytics/assignments'); // Update with correct endpoint
+        if (response.ok) {
+            const assignments = await response.json();
+            const assignmentSelect = document.getElementById('assignmentSelect');
+            assignments.forEach(assignment => {
+                const option = document.createElement('option');
+                option.value = assignment.assignmentId;
+                option.text = assignment.assignmentName;
+                assignmentSelect.add(option);
+            });
+        } else {
+            console.error('Failed to load assignments:', response.status);
+        }
+    }
+
+    // Fetch grades based on selected assignment
+    async function fetchGrades() {
+        const assignmentId = document.getElementById('assignmentSelect').value;
+        const response = await fetch(`http://localhost:8085/api/analytics/assignment/${assignmentId}/grades`);
+        if (response.ok) {
+            const data = await response.json();
+            const grades = data.grades;
+            createHistogram(grades);
+            createPieChart(grades);
+            createBoxPlot(grades);
+        } else {
+            console.error('Failed to fetch grades data:', response.status);
+        }
+    }
+
+    // Function to create the histogram using Chart.js
+    function createHistogram(grades) {
+        const ctx = document.getElementById('histogram').getContext('2d');
+        const histogram = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Array.from(new Set(grades)).sort((a, b) => a - b), // Unique sorted grades for x-axis
+                datasets: [{
+                    label: 'Frequency of Grades',
+                    data: Array.from(new Set(grades)).map(grade => grades.filter(g => g === grade).length), // Frequency
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    title: { display: true, text: 'Grades Histogram' }
+                }
+            }
+        });
+    }
+
+    // Function to create the pie chart using Chart.js
+    function createPieChart(grades) {
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        const gradeRanges = {
+            'A (90-100)': grades.filter(g => g >= 90).length,
+            'B (80-89)': grades.filter(g => g >= 80 && g < 90).length,
+            'C (70-79)': grades.filter(g => g >= 70 && g < 80).length,
+            'D (60-69)': grades.filter(g => g >= 60 && g < 70).length,
+            'F (< 60)': grades.filter(g => g < 60).length
+        };
+
+        const pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(gradeRanges),
+                datasets: [{
+                    label: 'Grade Distribution',
+                    data: Object.values(gradeRanges),
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',  // A
+                        'rgba(75, 192, 192, 0.6)',  // B
+                        'rgba(255, 206, 86, 0.6)',  // C
+                        'rgba(255, 159, 64, 0.6)',  // D
+                        'rgba(255, 99, 132, 0.6)'   // F
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    title: { display: true, text: 'Grade Distribution Pie Chart' }
+                }
+            }
+        });
+    }
+
+    // Function to create the box and whisker plot using Plotly
+    function createBoxPlot(grades) {
+        const trace = {
+            y: grades,
+            type: 'box',
+            name: 'Grades',
+            marker: { color: 'rgba(75, 192, 192, 0.6)' }
+        };
+        const data = [trace];
+        const layout = {
+            title: 'Grades Box and Whisker Plot',
+            yaxis: { title: 'Grades', zeroline: false }
+        };
+
+        Plotly.newPlot('boxPlot', data, layout);
+    }
+
+    // Call loadAssignments on page load to populate dropdown
+    window.onload = loadAssignments;
+
+</script>
+
+</body>
+</html>
