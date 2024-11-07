@@ -7,32 +7,96 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { width: 80%; margin: 0 auto; padding: 20px; }
-        #histogram, #pieChart { width: 300px; height: 150px; margin-top: 20px; }
-        #boxPlot { width: 300px; height: 250px; margin-top: 20px; }
+        /* Dark mode styling */
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background-color: #1c1c1e; 
+            color: #ffffff; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container { 
+            width: 90%; 
+            max-width: 800px;
+            margin: 20px;
+            padding: 30px;
+            background-color: #2c2c2e;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+        h1, h2 {
+            color: #ffa726;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        label {
+            color: #ffcc80;
+            font-weight: bold;
+            margin-top: 15px;
+            display: inline-block;
+            font-size: 1.1em;
+        }
+        select {
+            background-color: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 1em;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        canvas, #boxPlot {
+            margin: 20px auto;
+            width: 100% !important;
+            max-width: 700px;
+            background-color: #2c2c2e;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        /* Animations */
+        .chart-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .chart-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Grades Analytics</h1>
+    <h1>📊 Grades Analytics</h1>
 
     <!-- Assignment Selection Dropdown -->
-    <label for="assignmentSelect">Choose an assignment:</label>
+    <label for="assignmentSelect">Choose an Assignment:</label>
     <select id="assignmentSelect" onchange="fetchGrades()"></select>
 
     <!-- Histogram Section -->
-    <h2>Histogram of Grades</h2>
-    <canvas id="histogram"></canvas>
+    <div class="chart-section" id="histogramSection">
+        <h2>📈 Histogram of Grades</h2>
+        <canvas id="histogram"></canvas>
+    </div>
 
     <!-- Pie Chart Section -->
-    <h2>Pie Chart of Grade Distribution</h2>
-    <canvas id="pieChart"></canvas>
+    <div class="chart-section" id="pieChartSection">
+        <h2>🍰 Pie Chart of Grade Distribution</h2>
+        <canvas id="pieChart"></canvas>
+    </div>
 
     <!-- Box and Whisker Plot Section -->
-    <h2>Box and Whisker Plot</h2>
-    <div id="boxPlot"></div>
+    <div class="chart-section" id="boxPlotSection">
+        <h2>📦 Box and Whisker Plot</h2>
+        <div id="boxPlot"></div>
+    </div>
 </div>
 
 <script>
@@ -40,12 +104,16 @@
     async function loadAssignments() {
         const response = await fetch('http://localhost:8085/api/analytics/assignments'); // Update with correct endpoint
         if (response.ok) {
-            const assignments = await response.json();
+            const assignmentIds = await response.json();
             const assignmentSelect = document.getElementById('assignmentSelect');
-            assignments.forEach(assignment => {
+            
+            assignmentSelect.innerHTML = ""; // Clear existing options
+
+            // Populate dropdown with assignment IDs
+            assignmentIds.forEach(id => {
                 const option = document.createElement('option');
-                option.value = assignment.assignmentId;
-                option.text = assignment.assignmentName;
+                option.value = id;
+                option.text = `Assignment ${id}`;
                 assignmentSelect.add(option);
             });
         } else {
@@ -63,23 +131,28 @@
             createHistogram(grades);
             createPieChart(grades);
             createBoxPlot(grades);
+            showCharts();
         } else {
             console.error('Failed to fetch grades data:', response.status);
         }
     }
 
-    // Function to create the histogram using Chart.js
+    let histogram;
+
     function createHistogram(grades) {
         const ctx = document.getElementById('histogram').getContext('2d');
-        const histogram = new Chart(ctx, {
+        
+        if (histogram) histogram.destroy();
+
+        histogram = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: Array.from(new Set(grades)).sort((a, b) => a - b), // Unique sorted grades for x-axis
+                labels: Array.from(new Set(grades)).sort((a, b) => a - b),
                 datasets: [{
                     label: 'Frequency of Grades',
-                    data: Array.from(new Set(grades)).map(grade => grades.filter(g => g === grade).length), // Frequency
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    data: Array.from(new Set(grades)).map(grade => grades.filter(g => g === grade).length),
+                    backgroundColor: 'rgba(255, 193, 7, 0.6)',
+                    borderColor: 'rgba(255, 193, 7, 1)',
                     borderWidth: 1
                 }]
             },
@@ -88,24 +161,28 @@
                     y: { beginAtZero: true }
                 },
                 plugins: {
-                    title: { display: true, text: 'Grades Histogram' }
+                    title: { display: true, text: 'Grades Histogram', color: '#ffa726' },
+                    legend: { labels: { color: '#ffffff' } }
                 }
             }
         });
     }
 
-    // Function to create the pie chart using Chart.js
+    let pieChart;
+
     function createPieChart(grades) {
         const ctx = document.getElementById('pieChart').getContext('2d');
         const gradeRanges = {
-            'A (90-100)': grades.filter(g => g >= 90).length,
-            'B (80-89)': grades.filter(g => g >= 80 && g < 90).length,
-            'C (70-79)': grades.filter(g => g >= 70 && g < 80).length,
-            'D (60-69)': grades.filter(g => g >= 60 && g < 70).length,
-            'F (< 60)': grades.filter(g => g < 60).length
+            'A (90-100)': grades.filter(g => g >= .90).length,
+            'B (80-89)': grades.filter(g => g >= .80 && g < .90).length,
+            'C (70-79)': grades.filter(g => g >= .70 && g < .80).length,
+            'D (60-69)': grades.filter(g => g >= .60 && g < .70).length,
+            'F (< 60)': grades.filter(g => g < .60).length
         };
 
-        const pieChart = new Chart(ctx, {
+        if (pieChart) pieChart.destroy();
+
+        pieChart = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: Object.keys(gradeRanges),
@@ -113,11 +190,11 @@
                     label: 'Grade Distribution',
                     data: Object.values(gradeRanges),
                     backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',  // A
-                        'rgba(75, 192, 192, 0.6)',  // B
-                        'rgba(255, 206, 86, 0.6)',  // C
-                        'rgba(255, 159, 64, 0.6)',  // D
-                        'rgba(255, 99, 132, 0.6)'   // F
+                        'rgba(54, 162, 235, 0.6)', 
+                        'rgba(75, 192, 192, 0.6)', 
+                        'rgba(255, 206, 86, 0.6)', 
+                        'rgba(255, 159, 64, 0.6)', 
+                        'rgba(255, 99, 132, 0.6)'  
                     ],
                     borderColor: [
                         'rgba(54, 162, 235, 1)',
@@ -131,32 +208,45 @@
             },
             options: {
                 plugins: {
-                    title: { display: true, text: 'Grade Distribution Pie Chart' }
+                    title: { display: true, text: 'Grade Distribution Pie Chart', color: '#ffa726' },
+                    legend: { labels: { color: '#ffffff' } }
                 }
             }
         });
     }
 
-    // Function to create the box and whisker plot using Plotly
+    let thereIsABoxPlot = false;
+    
     function createBoxPlot(grades) {
+        if (!thereIsABoxPlot) {thereIsABoxPlot = true;}
+        else { Plotly.purge(document.getElementById("boxPlot")); }
+        
         const trace = {
             y: grades,
             type: 'box',
             name: 'Grades',
-            marker: { color: 'rgba(75, 192, 192, 0.6)' }
+            marker: { color: 'rgba(255, 193, 7, 0.6)' },
+            line: { color: '#ffa726' }
         };
         const data = [trace];
         const layout = {
             title: 'Grades Box and Whisker Plot',
-            yaxis: { title: 'Grades', zeroline: false }
+            titlefont: { color: '#ffa726' },
+            yaxis: { title: 'Grades', zeroline: false, color: '#ffffff' },
+            paper_bgcolor: '#2c2c2e',
+            plot_bgcolor: '#2c2c2e'
         };
 
         Plotly.newPlot('boxPlot', data, layout);
     }
 
-    // Call loadAssignments on page load to populate dropdown
-    window.onload = loadAssignments;
+    function showCharts() {
+        document.getElementById('histogramSection').classList.add('visible');
+        document.getElementById('pieChartSection').classList.add('visible');
+        document.getElementById('boxPlotSection').classList.add('visible');
+    }
 
+    window.onload = loadAssignments;
 </script>
 
 </body>
