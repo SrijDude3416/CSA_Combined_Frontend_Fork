@@ -5,6 +5,7 @@ type: issues
 permalink: /student-info
 comments: false
 ---
+
 <html>
 <head>
   <title>Student GitHub Profile</title>
@@ -72,6 +73,7 @@ comments: false
     };
 
     try {
+      // Fetch student data from your backend
       const studentResponse = await fetch("http://localhost:8181/api/students/find", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,11 +84,32 @@ comments: false
 
       const student = await studentResponse.json();
       const githubUsername = student.username;
+
+      // Fetch GitHub user profile
       const githubResponse = await fetch(`https://api.github.com/users/${githubUsername}`);
-
       if (!githubResponse.ok) throw new Error("GitHub profile not found");
-
       const githubData = await githubResponse.json();
+
+      // Fetch GitHub user events for issues, PRs, and commits data
+      const eventsResponse = await fetch(`https://api.github.com/users/${githubUsername}/events`);
+      if (!eventsResponse.ok) throw new Error("GitHub events not found");
+      const eventsData = await eventsResponse.json();
+
+      // Define the start date for filtering events
+      const startDate = new Date("2024-08-01T00:00:00Z");
+
+      // Count events occurring after the start date
+      const commitsCount = eventsData.filter(event => 
+        event.type === "PushEvent" && new Date(event.created_at) >= startDate
+      ).length;
+
+      const prsCount = eventsData.filter(event => 
+        event.type === "PullRequestEvent" && new Date(event.created_at) >= startDate
+      ).length;
+
+      const issuesCount = eventsData.filter(event => 
+        event.type === "IssuesEvent" && new Date(event.created_at) >= startDate
+      ).length;
 
       // Populate the details on the page
       document.getElementById("profile-pic").src = githubData.avatar_url;
@@ -97,10 +120,10 @@ comments: false
       document.getElementById("githubGists").innerText = githubData.public_gists;
       document.getElementById("githubFollowers").innerText = githubData.followers;
 
-      // For additional GitHub data like issues, PRs, and commits, you might need to fetch from different API endpoints or specific repositories.
-      document.getElementById("githubIssues").innerText = "15"; // Placeholder data
-      document.getElementById("githubPulls").innerText = "5";   // Placeholder data
-      document.getElementById("githubCommits").innerText = "517"; // Placeholder data
+      // Display the filtered event data
+      document.getElementById("githubIssues").innerText = issuesCount;
+      document.getElementById("githubPulls").innerText = prsCount;
+      document.getElementById("githubCommits").innerText = commitsCount;
 
     } catch (error) {
       console.error("Error:", error);
