@@ -44,7 +44,7 @@ show_reading_time: false
             </p>
             <p>
                 <label>
-                    Email:
+                    Email/ Github id:
                     <input type="text" name="signupUid" id="signupUid" required>
                 </label>
             </p>
@@ -161,7 +161,7 @@ window.signup = function(){
         cache: "no-cache",
         headers: (new Headers({"Content-Type":"application/json"})),
         body: JSON.stringify({
-                email:  document.getElementById("signupUid").value,//later add to signup
+                ghid:  document.getElementById("signupUid").value,//later add to signup
                 dob: "11-01-2024",
                 name: document.getElementById("name").value,
                 password: document.getElementById("signupPassword").value,
