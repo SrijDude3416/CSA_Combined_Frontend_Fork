@@ -1,4 +1,3 @@
-import { javaURI } from '../../js/api/config.js';
 async function streamerInit() {
     try {
         firstInLine = document.getElementById("waitingList").firstElementChild.textContent;
@@ -43,7 +42,7 @@ async function streamerNegotiation(peer) {
         sdp: peer.localDescription
     };
 
-    fetch(javaURI+"/webrtc/broadcast",
+    fetch(rtcServer+"/webrtc/broadcast",
         {
             method:"POST",
             body:JSON.stringify(payload),
