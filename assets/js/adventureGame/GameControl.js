@@ -188,7 +188,7 @@ const GameControl = {
         const statsContainer = document.createElement('div');
         statsContainer.id = 'stats-container';
         statsContainer.style.position = 'fixed';
-        statsContainer.style.top = '10px';
+        statsContainer.style.top = '75px'; 
         statsContainer.style.right = '10px';
         statsContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
         statsContainer.style.color = 'white';
@@ -201,6 +201,7 @@ const GameControl = {
         `;
         document.body.appendChild(statsContainer);
     },
+
 };
 
 // Detect window resize events and call the resize function.

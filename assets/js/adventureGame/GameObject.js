@@ -326,55 +326,49 @@ class GameObject {
         // Bounding rectangles from Canvas
         const thisRect = this.canvas.getBoundingClientRect();
         const otherRect = other.canvas.getBoundingClientRect();
-    
-        // Calculate center points of rectangles
-        const thisCenterX = (thisRect.left + thisRect.right) / 2;
-        const otherCenterX = (otherRect.left + otherRect.right) / 2;
 
-        // Calculate new center points of rectangles
-        const thisRectWidth = thisRect.right - thisRect.left;
-        const thisRectLeftNew = otherCenterX - thisRectWidth / 2;
-    
         // Calculate hitbox constants
-        var widthPercentage = this.hitbox?.widthPercentage || 0.0;
-        var heightPercentage = this.hitbox?.heightPercentage || 0.0;
-    
+        const widthPercentage = this.hitbox?.widthPercentage || 0.0;
+        const heightPercentage = this.hitbox?.heightPercentage || 0.0;
+
         // Calculate hitbox reductions from the width and height
         const widthReduction = thisRect.width * widthPercentage;
         const heightReduction = thisRect.height * heightPercentage;
-    
+
         // Build hitbox by subtracting reductions from the left, right, top, and bottom
         const thisLeft = thisRect.left + widthReduction;
         const thisTop = thisRect.top + heightReduction;
         const thisRight = thisRect.right - widthReduction;
         const thisBottom = thisRect.bottom;
-        const tolerance = 10; // Adjust as needed
 
         // Determine hit and touch points of hit
-        this.collisionData = {
-            hit: (
-                thisLeft < otherRect.right &&
-                thisRight > otherRect.left &&
-                thisTop < otherRect.bottom &&
-                thisBottom > otherRect.top
-            ),
-            touchPoints: {
-                this: {
-                    id: this.canvas.id,
-                    top: thisRect.bottom > otherRect.top,
-                    bottom: thisRect.bottom <= otherRect.top,
-                    left: thisCenterX > otherCenterX,
-                    right: thisCenterX <= otherCenterX,
-                },
-                other: {
-                    id: other.canvas.id,
-                    top: thisRect.bottom < otherRect.top,
-                    bottom: thisRect.bottom >= otherRect.top,
-                    left: thisCenterX < otherCenterX, 
-                    right: thisCenterX >= otherCenterX,
-                },
+        const hit = (
+            thisLeft < otherRect.right &&
+            thisRight > otherRect.left &&
+            thisTop < otherRect.bottom &&
+            thisBottom > otherRect.top
+        );
+
+        const touchPoints = {
+            this: {
+                id: this.canvas.id,
+                top: thisBottom > otherRect.top && thisTop < otherRect.top,
+                bottom: thisTop < otherRect.bottom && thisBottom > otherRect.bottom,
+                left: thisRight > otherRect.left && thisLeft < otherRect.left,
+                right: thisLeft < otherRect.right && thisRight > otherRect.right,
+            },
+            other: {
+                id: other.canvas.id,
+                top: otherRect.bottom > thisTop && otherRect.top < thisTop,
+                bottom: otherRect.top < thisBottom && otherRect.bottom > thisBottom,
+                left: otherRect.right > thisLeft && otherRect.left < thisLeft,
+                right: otherRect.left < thisRight && otherRect.right > thisRight,
             },
         };
+
+        this.collisionData = { hit, touchPoints };
+
+        console.log("Collision Data:", this.collisionData);
     }
 
 
@@ -387,7 +381,7 @@ class GameObject {
         this.handleCollisionStart();
         this.handleCollisionEnd();
         this.setActiveCollision();
-        this.handlePlayerReaction();
+        this.handleGameObjectReaction();
     }
    
     /**
@@ -442,44 +436,45 @@ class GameObject {
      */
     // Assuming you have some kind of input handling system
 
-    handlePlayerReaction() {
+    handleGameObjectReaction() {
         // handle player reaction based on collision type
-        switch (this.state.collision) {
-            // 1. Player is on top of npc
-            case "npc":
-            case "player":
+        if (this.state.collision) {
+            const touchPoints = this.collisionData.touchPoints.this;
 
-                if (this.collisionData.touchPoints.this.top) {
-                    this.state.movement = { up: true, down: false, left: true, right: true};
-                    if (this.velocity.y < 0) {
-                        this.velocity.y = 0;
-                    }
-                
-                }
+            // Reset movement to allow all directions initially
+            this.state.movement = { up: true, down: true, left: true, right: true };
 
-                if (this.collisionData.touchPoints.this.bottom) {
-                    this.state.movement = { up: false, down: true, left: true, right: true};
-                    if (this.velocity.y > 0) {
-                        this.velocity.y = 0;
-                    }
+            if (touchPoints.top) {
+                console.log("Collision from top");
+                this.state.movement.down = false;
+                if (this.velocity.y > 0) {
+                    this.velocity.y = 0;
+                }
+            }
 
-                } 
-                
-                if (this.collisionData.touchPoints.this.right) {
-                    this.state.movement = { up: true, down: true, left: true, right: false };
-                    if (this.velocity.x > 0) {
-                        this.velocity.x = 0;
-                    }
-                
+            if (touchPoints.bottom) {
+                console.log("Collision from bottom");
+                this.state.movement.up = false;
+                if (this.velocity.y < 0) {
+                    this.velocity.y = 0;
                 }
-                
-                if (this.collisionData.touchPoints.this.left) {
-                    this.state.movement = { up: true, down: true, left: false, right: true};
-                    if (this.velocity.x < 0) {
-                        this.velocity.x = 0;
-                    }
+            }
+
+            if (touchPoints.right) {
+                console.log("Collision from right");
+                this.state.movement.left = false;
+                if (this.velocity.x < 0) {
+                    this.velocity.x = 0;
                 }
-                break;
+            }
+
+            if (touchPoints.left) {
+                console.log("Collision from left");
+                this.state.movement.right = false;
+                if (this.velocity.x > 0) {
+                    this.velocity.x = 0;
+                }
+            }
         }
     }
  
