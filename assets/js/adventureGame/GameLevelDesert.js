@@ -27,7 +27,7 @@ class GameLevelDesert {
     const CHILLGUY_SCALE_FACTOR = 5;
     const sprite_src_chillguy = path + "/images/gamify/chillguy.png";
     const sprite_data_chillguy = {
-        name: 'Chill Guy',
+        id: 'Chill Guy',
         src: sprite_src_chillguy,
         SCALE_FACTOR: CHILLGUY_SCALE_FACTOR,
         STEP_FACTOR: 1000,
@@ -42,12 +42,10 @@ class GameLevelDesert {
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
     };
 
-
-
     // NPC sprite data (tux)
     const sprite_src_tux = path + "/images/gamify/tux.png";
     const sprite_data_tux = {
-        name: 'npc',
+        id: 'Tux',
         src: sprite_src_tux,
         SCALE_FACTOR: 10,  // Adjust this based on your scaling needs
         ANIMATION_RATE: 50,
@@ -60,7 +58,7 @@ class GameLevelDesert {
       // NPC sprite data (tux)
       const sprite_src_octocat = path + "/images/gamify/octocat.png";
       const sprite_data_octocat = {
-          name: 'npc',
+          id: 'Octocat',
           src: sprite_src_octocat,
           SCALE_FACTOR: 10,  // Adjust this based on your scaling needs
           ANIMATION_RATE: 50,

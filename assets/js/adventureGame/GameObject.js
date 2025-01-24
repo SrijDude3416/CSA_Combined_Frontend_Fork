@@ -62,7 +62,7 @@ class GameObject {
         this.state = {...this.initEnvironmentState}; // Object control data 
         // Create canvas element
         this.canvas = document.createElement("canvas");
-        this.canvas.id = data.name || "default";
+        this.canvas.id = data.id || "default";
         this.canvas.width = data.pixels.width || 0;
         this.canvas.height = data.pixels.height || 0;
         this.ctx = this.canvas.getContext('2d');
@@ -388,21 +388,20 @@ class GameObject {
      * gameLoop: Watch for Player collision events 
      */
     handleCollisionStart() {
-        this.handleCollisionEvent("npc");
-        this.handleCollisionEvent("player");
+        // Empty method to be overridden by subclasses if needed
     }
 
     /**
-     * gameLoop helper: Adds the collisionType to the collisions array when player is touching the object
-     * @param {*} collisionType 
+     * Update the collisions array when player is touching the object being watched
+     * @param {*} objectID 
      */
-    handleCollisionEvent(collisionType) {
+    handleCollisionEvent(objectID) {
         // check if player is touching the "collisionType" object
-        if (this.collisionData.touchPoints.other.id === collisionType) {
+        if (this.collisionData.touchPoints.other.id === objectID) {
             // check if the collisionType is not already in the collisions array
-            if (!this.state.collisions.includes(collisionType)) {
+            if (!this.state.collisions.includes(objectID)) {
                 // add the collisionType to the collisions array, making it the current collision
-                this.state.collisions.push(collisionType);
+                this.state.collisions.push(objectID);
             }
         }
     }
@@ -476,6 +475,12 @@ class GameObject {
                 }
             }
         }
+
+        this.handleCollisionAction();
+    }
+
+    handleCollisionAction() {
+        // Empty method to be overridden by subclasses if needed
     }
  
 }

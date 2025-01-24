@@ -114,7 +114,7 @@ class Npc extends GameObject {
                 );
                 // The distance is less than 100 pixels
                 if (player != npc && distance <= 500) {
-                    names.push(player.spriteData.name);
+                    names.push(player.spriteData.id);
                 }
             });
             // Join all player names inside the proximity

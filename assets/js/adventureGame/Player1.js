@@ -50,6 +50,16 @@ class Player1 extends GameObject {
         }
     }
 
+    /**
+     * gameLoop: Watch for Player collision events 
+     */
+    handleCollisionStart() {
+        // Empty method to be overridden by subclasses if needed
+    }
+    
+    handleCollisionAction() {
+        // Empty method to be overridden by subclasses if needed
+    }
 }
 
 export default Player1;
