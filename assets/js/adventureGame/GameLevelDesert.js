@@ -140,37 +140,6 @@ class GameLevelDesert {
         }
       };
 
-  /*  // NPC data for HTML Hank
-const sprite_src_htmlhank = path + "/images/gamify/htmlhank.png"; // be sure to include the path
-const sprite_data_htmlhank = {
-    id: 'HTML Hank',
-    greeting: "Hey there! I'm HTML Hank, the web architect. Let's build some awesome webpages together!",
-    src: sprite_src_html_hank,
-    SCALE_FACTOR: 8,  // Adjust this based on your scaling needs
-    ANIMATION_RATE: 60,
-    pixels: { height: 350, width: 550 },
-    INIT_POSITION: { x: (width / 2), y: (height / 2) },
-    orientation: { rows: 2, columns: 4 },
-    down: { row: 0, start: 0, columns: 3 },  // This is the stationary NPC, down is default
-    hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-
-    // HTML & CSS quiz
-    quiz: { 
-        title: "HTML & CSS Mastery Quiz",
-        questions: [
-            "What does HTML stand for?\n1. HyperText Markup Language\n2. HighText Machine Learning\n3. Hyper Transfer Markup Language\n4. Hyper Tool Markup Language",
-            "Which HTML tag is used to define the largest heading?\n1. <h1>\n2. <h6>\n3. <header>\n4. <h0>",
-            "Which tag is used to create a hyperlink in HTML?\n1. <a>\n2. <link>\n3. <href>\n4. <url>",
-            "Which CSS property is used to change text color?\n1. color\n2. text-color\n3. font-color\n4. bgcolor",
-            "Which unit is relative to the font size of the root element in CSS?\n1. rem\n2. em\n3. px\n4. vh",
-            "What is the correct way to reference an external CSS file?\n1. <link rel='stylesheet' href='styles.css'>\n2. <style src='styles.css'>\n3. <css file='styles.css'>\n4. <script href='styles.css'>",
-            "How do you center an element horizontally using CSS?\n1. margin: auto;\n2. align: center;\n3. text-align: middle;\n4. float: center;",
-            "Which HTML tag is used for creating an unordered list?\n1. <ul>\n2. <ol>\n3. <list>\n4. <li>",
-            "What is the purpose of the <meta> tag in HTML?\n1. To provide metadata about the document\n2. To create a navigation menu\n3. To define the main content area\n4. To embed images"
-        ]
-    }
-}; */
-
     // List of objects defnitions for this level
     this.objects = [
       { class: Background, data: image_data_desert },
@@ -178,7 +147,6 @@ const sprite_data_htmlhank = {
       { class: Npc, data: sprite_data_tux },
       { class: Npc, data: sprite_data_octocat },
       { class: Npc, data: sprite_data_robot },
-     // { class: Npc, data: sprite_data_htmlhank }, 
     ];
   }
 
