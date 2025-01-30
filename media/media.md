@@ -73,15 +73,7 @@ permalink: /media
         let lives = 3;
         let score = 0;
         async function fetchUser() {
-            const response = await fetch(javaURI + `/api/person/get`, {
-                method: 'GET',
-                cache: "no-cache",
-                credentials: 'include',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-Origin': 'client' 
-                }
-            });
+            const response = await fetch(javaURI + `/api/person/get`, fetchOptions);
             if (response.ok) {
                 const userInfo = await response.json();
                 const person = userInfo.name;
