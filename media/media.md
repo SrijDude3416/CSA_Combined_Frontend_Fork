@@ -9,7 +9,24 @@ permalink: /media
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<style>
+.button-class {
+    background-color: rgb(71, 167, 75) !important; /* Nighthawk Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 30px;
+}		
+</style>
 <body>
+    <button class="button-class" onclick="window.location.href='{{site.baseurl}}/media/leaderboard';">Leaderboard</button>
     <p>Drag the images into the correct bins (Left, Center, or Right). You have 3 lives!</p>
     <div id="username-container" style="margin-bottom: 20px;">
         <p id="display-username" style="font-size: 18px; margin-top: 10px;">Username: <span id="current-username">Guest</span></p>
@@ -61,7 +78,7 @@ permalink: /media
             });
         </script>
     </div>
-    <button id="submit" style="margin-top: 20px;">Submit</button>
+    <button class="button-class" id="submit" style="margin-top: 20px;">Submit</button>
     <script type="module">
         import {javaURI, fetchOptions} from "{{site.baseurl}}/assets/js/api/config.js";
         const bins = document.querySelectorAll('.bin');
