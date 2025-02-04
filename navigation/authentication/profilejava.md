@@ -23,7 +23,7 @@ show_reading_time: false
      </div>
      <div>
         <label for="newStudentID">Enter New Student ID: </label>
-        <input type="number" id="newStudentId" placeholder="NewStudentID">
+        <input type="text" id="newStudentId" placeholder="NewStudentID">
     </div>
       <div>
        <label for="newPassword">Enter New Password:</label>
