@@ -35,12 +35,9 @@ class Npc extends Character {
      * @param {Object} event - The keydown event.
      */
     handleKeyDown({ key }) {
-        switch (key) {
-            case 'e': // Player 1 interaction
-            case 'u': // Player 2 interaction
-                this.shareQuizQuestion();
-                NpcTracker.addNpc(this.npcName); // Add the NPC to the tracker
-                break;
+        if (key === 'e' || key === 'u') { // Player interaction
+            this.shareQuizQuestion();
+            NpcTracker.addNpc(this.npcName); // Add this specific NPC
         }
     }
 
@@ -50,7 +47,6 @@ class Npc extends Character {
      */
     handleKeyUp({ key }) {
         if (key === 'e' || key === 'u') {
-            // Clear any active timeouts when the interaction key is released
             if (this.alertTimeout) {
                 clearTimeout(this.alertTimeout);
                 this.alertTimeout = null;
