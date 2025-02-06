@@ -1,6 +1,6 @@
 class NpcTracker {
     constructor() {
-        this.encounteredNpcs = new Set(); // Store unique NPC names
+        this.encounteredNpcs = []; // Store NPC names in order
         this.trackerContainer = this.createTrackerContainer();
     }
 
@@ -20,10 +20,10 @@ class NpcTracker {
         return container;
     }
 
-    // Update the UI when the player interacts with a new NPC
+    // Add only one NPC at a time in order
     addNpc(npcName) {
-        if (!this.encounteredNpcs.has(npcName)) {
-            this.encounteredNpcs.add(npcName);
+        if (!this.encounteredNpcs.includes(npcName)) {
+            this.encounteredNpcs.push(npcName);
             this.updateTrackerDisplay();
         }
     }
@@ -31,7 +31,7 @@ class NpcTracker {
     // Refresh the displayed list of NPCs
     updateTrackerDisplay() {
         this.trackerContainer.innerHTML = `<strong>NPCs Encountered:</strong><br>` + 
-            Array.from(this.encounteredNpcs).join("<br>");
+            this.encounteredNpcs.join("<br>");
     }
 }
 
